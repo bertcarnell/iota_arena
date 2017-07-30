@@ -90,4 +90,13 @@ class TestCard(TestCase):
                         self.assertFalse(a == Card(i, j, k, m))
         self.assertRaises(NotImplementedError, a.__eq__, 5)
 
+    def test_ne(self):
+        a = Card(1, 1, 1, False)
+        b = Card(1, 2, 1, False)
+        self.assertTrue(a != b)
+        self.assertFalse(b != b)
+
+        self.assertRaises(NotImplementedError, a.__ne__, 5)
+
+
 

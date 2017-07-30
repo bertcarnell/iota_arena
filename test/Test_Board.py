@@ -53,6 +53,7 @@ class TestBoard(TestCase):
         b.place_cards([],[])
 
     def test_find_adjacent_cards(self):
+        # test normal operation
         b = Board()
         a1 = Card(1,1,1,False)
         a2 = Card(2,2,1,False)
@@ -66,4 +67,74 @@ class TestBoard(TestCase):
         self.assertEqual(len(hor.get_cards()), 3)
         self.assertEqual(len(ver.get_cards()), 4)
 
+        # test looking off the board
         self.assertRaises(ValueError, lambda: b.find_adjacent_cards(a7, 1000, 1000))
+
+        # test an empty board
+        empty_board = Board()
+        self.assertTrue(empty_board.is_empty())
+        n1, n2 = empty_board.find_adjacent_cards(a7, 10, 10)
+        self.assertTrue(n1 is None)
+        self.assertTrue(n2 is None)
+
+        # test invalid sequence
+        b = Board()
+        b.place_cards([a1, a2, a7], [[10,9],[10,11],[10,12]])
+        hor, ver = b.find_adjacent_cards(a5, 10, 10)
+        self.assertTrue(hor is None)
+        self.assertTrue(ver is None)
+
+    def test_score_locations(self):
+        # test normal operation
+        b = Board()
+        a1 = Card(1,1,1,False)
+        a2 = Card(2,2,1,False)
+        a3 = Card(2,3,1,False)
+        a4 = Card(3,1,1,False)
+        a5 = Card(4,1,1,False)
+        a7 = Card(2,1,1,False)
+        # 1
+        # 2 2 2
+        # 3
+        # 4
+        # pre-existing on the board
+        b.place_cards([a1,a2,a3,a4],[[9,10],[10,11],[10,12],[11,10]])
+        b.place_card(a5, [12,10])
+        # card played this turn
+        b.place_card(a7, [10, 10])
+        # score the cards played
+        score = b.score_locations([a7], [[10, 10]])
+        self.assertEqual(score, (10+6)*2)
+
+        # test errors
+        self.assertRaises(ValueError, lambda: b.score_locations([a7],[[1,1],[2,2]]))
+        self.assertRaises(ValueError, lambda: b.score_locations([a7],[[1,1,1]]))
+
+        b = Board()
+        #   1
+        # 2 2 2 2
+        #   3
+        #   4
+        b.place_cards([a1,a2,a3,a4],[[9,10],[10,11],[10,12],[11,10]])
+        b.place_card(a5, [12,10])
+        b.place_card(Card(2,4,1,False), [10,9])
+        # this turn
+        b.place_card(a7, [10,10])
+        score = b.score_locations([a7], [[10, 10]])
+        self.assertEqual(score, (10+8)*2*2)
+
+        b = Board()
+        #   1
+        # 2 2 2 2
+        #   3
+        #   4
+        b.place_cards([a1, a4, a5],[[9,10],[11,10],[12,10]])
+        # this turn
+        b.place_cards([Card(2,4,1,False),a7,a2,a3], [[10, 9],[10,10],[10,11],[10,12]])
+        score = b.score_locations([Card(2,4,1,False),a7,a2,a3], [[10, 9],[10,10],[10,11],[10,12]])
+        self.assertEqual(score, (10+8)*2*2*2)
+
+        b = Board()
+        b.place_card(a1, [10,10])
+        score = b.score_locations([a1], [[10,10]])
+        self.assertEqual(score, 1)

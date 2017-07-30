@@ -41,6 +41,25 @@ class Sequence(object):
         if len(self.cards) > 1:
             self.cards.sort(key=lambda x: x.sort_order())
 
+    def __eq__(self, other):
+        if not isinstance(other, Sequence):
+            raise NotImplementedError()
+        return self.cards == other.get_cards()
+
+    def __hash__(self):
+        if len(self.cards) == 0:
+            return hash(0)
+        return hash("".join(str(cd) for cd in self.cards))
+
+    def get_sum_scores(self):
+        score = 0
+        for cd in self.cards:
+            score += cd.get_value()
+        return score
+
+    def length(self):
+        return len(self.cards)
+
     def is_valid_sequence(self):
         # if the sequence is too long or not a sequence at all, then return False
         if len(self.cards) < 1 or len(self.cards) > 4:

@@ -135,3 +135,11 @@ class Card(object):
                 return False
         raise NotImplementedError()
 
+    def __ne__(self, other):
+        if isinstance(other, Card):
+            if self.sort_order() != other.sort_order():
+                return True
+            else:
+                return False
+        raise NotImplementedError()
+

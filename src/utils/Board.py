@@ -74,6 +74,7 @@ class Board(object):
             raise ValueError("location for card is outside the board")
         if self.empty:
             return [None, None]
+
         # look horizontally
         horizontal_group = Sequence()
         horizontal_group.add(card)
@@ -88,6 +89,8 @@ class Board(object):
                 horizontal_group.add(self.m[x,yi])
             else:
                 break
+
+        # look vertically
         vertical_group = Sequence()
         vertical_group.add(card)
         for xi in range(x+1, x+4, 1):
@@ -110,8 +113,12 @@ class Board(object):
 
         return [horizontal_group, vertical_group]
 
-    @staticmethod
     def score_locations(self, cards, locations):
+        """ Score the cards that were played this turn.  They must already be on the board
+        :param array cards: an array of Cards
+        :param array locations: an array of arrays containing x,y coordinates
+        :return int: the score
+        """
         if len(cards) != len(locations):
             raise ValueError("the length of cards and locations should be the same")
         if len(locations) != 0 and len(locations[0]) != 2:
@@ -121,25 +128,30 @@ class Board(object):
         vertical_groups = []
         for i in range(len(cards)):
             horizontal_group, vertical_group = self.find_adjacent_cards(cards[i], locations[i][0], locations[i][1])
-            horizontal_groups.append(horizontal_group)
-            vertical_groups.append(vertical_group)
+            # if a card is next to nothing horizontally or vertically, then it must be the first play alone
+            if len(cards) == 1 and horizontal_group.length() == 1 and vertical_group.length() == 1:
+                return cards[0].get_value()
+            # if a card has no horizontal sequence, then it must have a vertical neighbor
+            # don't add single cards
+            if horizontal_group.length() > 1:
+                horizontal_groups.append(horizontal_group)
+            if vertical_group.length() > 1:
+                vertical_groups.append(vertical_group)
         # find the unique sequences that are created
         horizontal_groups = set(horizontal_groups)
         vertical_groups = set(vertical_groups)
 
         score = 0
-        for i in range(len(horizontal_groups)):
-            for j in range(len(horizontal_groups[i])):
-                score += horizontal_groups[i][j].get_value()
-        for i in range(len(vertical_groups)):
-            for j in range(len(vertical_groups[i])):
-                score += vertical_groups[i][j].get_value()
+        for seq in horizontal_groups:
+            score += seq.get_sum_scores()
+        for seq in vertical_groups:
+            score += seq.get_sum_scores()
         if len(cards) == 4:
             score *= 2
-        for i in range(len(horizontal_groups)):
-            if len(horizontal_groups[i]) == 4:
+        for seq in horizontal_groups:
+            if seq.length() == 4:
                 score *= 2
-        for i in range(len(vertical_groups)):
-            if len(vertical_groups[i]) == 4:
+        for seq in vertical_groups:
+            if seq.length() == 4:
                 score *= 2
         return score

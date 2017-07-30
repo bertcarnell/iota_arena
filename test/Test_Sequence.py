@@ -248,3 +248,48 @@ class TestSequence(TestCase):
         s.add(Card(1, 1, 2, False))
         s.sort()
         self.assertEqual(s.get_cards()[0], Card(1, 1, 2, False))
+
+    def test_eq(self):
+        s1 = Sequence()
+        s2 = Sequence()
+        s1.add(Card(1,1,1,False))
+        s1.add(Card(2,2,2,False))
+        s2.add(Card(1,1,1,False))
+        s2.add(Card(2,2,2,False))
+        s3 = Sequence()
+        s3.add(Card(3,3,3,False))
+        self.assertEqual(s1, s2)
+        self.assertFalse(s1 == s3)
+
+        self.assertRaises(NotImplementedError, lambda: s1 == 5)
+
+    def test_sum_scores(self):
+        s1 = Sequence()
+        s1.add(Card(1, 1, 1, False))
+        s1.add(Card(2, 2, 2, False))
+        self.assertEqual(s1.get_sum_scores(), 3)
+
+    def test_length(self):
+        s1 = Sequence()
+        s1.add(Card(1, 1, 1, False))
+        s1.add(Card(2, 2, 2, False))
+        self.assertEqual(s1.length(), 2)
+
+    def test_hash(self):
+        s1 = Sequence()
+        hs1 = hash(s1)
+        s2 = Sequence()
+        s2.add(Card(1, 1, 1, False))
+        s2.add(Card(2, 2, 2, False))
+        hs2 = hash(s2)
+        s3 = Sequence()
+        s3.add(Card(1,1,1,False))
+        s3.add(Card(2,2,2,False))
+        hs3 = hash(s3)
+        s4 = Sequence()
+        s4.add(Card(3,3,3,False))
+        hs4 = hash(s4)
+
+        self.assertEqual(hs2, hs3)
+        self.assertFalse(hs1 == hs2)
+        self.assertFalse(hs4 == hs2)
