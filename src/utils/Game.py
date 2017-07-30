@@ -35,6 +35,9 @@ class Game(object):
         # create the pile
         self.pile = Pile()
         self.board = Board()
+        self.scores = []
+        for i in range(self.num_players):
+            self.scores.append(0)
 
     def play(self):
         """ Play the game
@@ -47,12 +50,18 @@ class Game(object):
         cnt = 0
         # while the pile still has cards and while the number of turns is still small (big turns indicates a problem)
         while self.pile.has_next() and cnt < 100:
+            # rotate around the players
             player_index = cnt % self.num_players
-            old_board = deepcopy(self.board)
+            # let the player play the card on the board
             played_cards, played_locations = self.players[player_index].play_cards(self.board)
-            # TODO:  validate the move
-            # TODO:  score the play
-            self.players[player_index].draw()
+            # score the valid cards or identify an invalid move
+            score = self.board.score_locations(played_cards, played_locations)
+            if score is None:
+                print('Invalid move by player index %s' % str(player_index))
+                return None
+            self.scores[player_index] = score
+            self.players[player_index].draw(self.pile)
             cnt += 1
 
+        # TODO:  once the pile is gone, there are still a few more plays
         # TODO:  return the winning player

@@ -21,6 +21,11 @@ import copy
 class OneCardPlayer(Player):
     """ A player that only plays one card at a time """
     def play_cards(self, board):
+        """
+
+        :param board:
+        :return: an Array of Cards, an Array of locations (each of x,y)
+        """
         # if the board is empty, then play the first card in the middle
         if board.is_empty():
             # find highest score card in hand
@@ -30,15 +35,15 @@ class OneCardPlayer(Player):
                 if self.hand.get_cards()[i].get_value() > first:
                     maxi = i
             temp_card = self.hand.use_card(maxi)
-            board.place_cards(temp_card, [[Pile.get_num_cards(),Pile.get_num_cards()]])
-            return temp_card, [[Pile.get_num_cards(),Pile.get_num_cards()]]
+            board.place_card(temp_card, [Pile.get_num_cards(),Pile.get_num_cards()])
+            return [temp_card], [[Pile.get_num_cards(), Pile.get_num_cards()]]
 
         # for each card in the hand
         # for each location in the board
         # find the location with the highest score
-        board_array = board.get_board()
-        nrows = board_array.shape[0]
-        ncols = board_array.shape[1]
+        b = board.get_board()
+        nrows = b.shape[0]
+        ncols = b.shape[1]
         max_score = 0
         max_x = -1
         max_y = -1
@@ -46,17 +51,51 @@ class OneCardPlayer(Player):
         for cd in range(len(self.hand.get_cards())):
             for x in range(nrows):
                 for y in range(ncols):
-                    board_copy = copy.deepcopy(board)
-                    board_copy.place_card(self.hand.get_cards()[cd], [x,y])
-                    current_score = board_copy.score_locations([self.hand.get_cards()[cd]], [[x,y]])
-                    if current_score > max_score:
-                        max_score = current_score
-                        max_x = x
-                        max_y = y
-                        max_card = cd
+                    if b[x,y].is_null():
+                        if y == 0 and x == 0:
+                            if b[x+1,y].is_null() and b[x,y+1].is_null():
+                                continue
+                        elif y == 0 and x < nrows - 1:
+                            if b[x-1,y].is_null() and b[x+1,y].is_null() and b[x,y+1].is_null():
+                                continue
+                        elif y == 0 and x == nrows - 1:
+                            if b[x-1,y].is_null() and b[x,y+1].is_null():
+                                continue
+                        elif x == 0 and y < ncols - 1:
+                            if b[x,y-1].is_null() and b[x,y+1].is_null() and b[x+1,y].is_null():
+                                continue
+                        elif x == 0 and y == ncols - 1:
+                            if b[x,y-1].is_null() and b[x+1,y].is_null():
+                                continue
+                        elif x == nrows - 1 and y == ncols - 1:
+                            if b[x-1,y].is_null() and b[x,y-1].is_null():
+                                continue
+                        elif x == nrows - 1:
+                            if b[x-1,y].is_null() and b[x,y-1].is_null() and b[x,y+1].is_null():
+                                continue
+                        elif y == ncols - 1:
+                            if b[x-1,y].is_null() and b[x+1,y].is_null() and b[x,y-1].is_null():
+                                continue
+                        else:
+                            if b[x-1,y].is_null() and b[x+1,y].is_null() and b[x,y+1].is_null() and b[x, y-1].is_null():
+                                continue
+                        board_copy = copy.copy(board)
+                        board_copy.place_card(self.hand.get_cards()[cd], [x,y])
+                        current_score = board_copy.score_locations([self.hand.get_cards()[cd]], [[x,y]])
+                        # TODO: what if the play was invalid
+                        # TODO:  what if there are no valid plays and you have to discard
+                        if current_score is None:
+                            continue
+                        if current_score > max_score:
+                            max_score = current_score
+                            max_x = x
+                            max_y = y
+                            max_card = cd
+                    else:
+                        continue
 
         temp_card = self.hand.use_card(max_card)
         board.place_card(temp_card, [max_x, max_y])
 
-        return temp_card, [[max_x, max_y]]
+        return [temp_card], [[max_x, max_y]]
 

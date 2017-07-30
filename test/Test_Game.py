@@ -16,6 +16,7 @@
 from unittest import TestCase
 from src.utils.Game import Game
 from src.utils.Player import Player
+from src.player_inventory.OneCardPlayer import OneCardPlayer
 
 
 class TestGame(TestCase):
@@ -31,9 +32,8 @@ class TestGame(TestCase):
             self.assertTrue(True)
 
     def test_play(self):
-        players = [Player(), Player()]
+        players = [OneCardPlayer(), OneCardPlayer()]
         g = Game(players)
-        # TODO:  Test Play
-        #g.play()
+        g.play()
 
 

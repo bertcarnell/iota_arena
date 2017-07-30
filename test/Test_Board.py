@@ -84,6 +84,32 @@ class TestBoard(TestCase):
         self.assertTrue(hor is None)
         self.assertTrue(ver is None)
 
+        # test corners
+        b = Board()
+        b.place_cards([a1,a2,a7], [[0,0],[0,1],[1,0]])
+        hor, ver = b.find_adjacent_cards(a1, 0, 0)
+        self.assertTrue(hor is not None)
+        self.assertTrue(ver is not None)
+
+        b = Board()
+        b.place_cards([a1,a2,a7], [[b.max_x-1,0],[b.max_x-1,1],[b.max_x-2,0]])
+        hor, ver = b.find_adjacent_cards(a1, b.max_x-1, 0)
+        self.assertTrue(hor is not None)
+        self.assertTrue(ver is not None)
+
+        b = Board()
+        b.place_cards([a1,a2,a7], [[0,b.max_y-1],[0,b.max_y-2],[1,b.max_y-1]])
+        hor, ver = b.find_adjacent_cards(a1, 0, b.max_y-1)
+        self.assertTrue(hor is not None)
+        self.assertTrue(ver is not None)
+
+        b = Board()
+        b.place_cards([a1,a2,a7], [[b.max_x-1,b.max_y-1],[b.max_x-2,b.max_y-1],[b.max_x-1,b.max_y-2]])
+        hor, ver = b.find_adjacent_cards(a1, b.max_x-1, b.max_y-1)
+        self.assertTrue(hor is not None)
+        self.assertTrue(ver is not None)
+
+
     def test_score_locations(self):
         # test normal operation
         b = Board()

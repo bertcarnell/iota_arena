@@ -24,9 +24,11 @@ class Board(object):
 
     def __init__(self):
         """ Initialize the Board """
-        self.m = npy.ndarray(shape=(2 * Pile.get_num_cards(), 2 * Pile.get_num_cards()), dtype=object, order='C')
-        for i in range(2 * Pile.num_cards):
-            for j in range(2 * Pile.get_num_cards()):
+        self.max_x = 2 * Pile.get_num_cards()
+        self.max_y = 2 * Pile.get_num_cards()
+        self.m = npy.ndarray(shape=(self.max_x, self.max_y), dtype=object, order='C')
+        for i in range(self.max_x):
+            for j in range(self.max_y):
                 self.m[i, j] = Card.null_card()
         self.empty = True
 
@@ -70,7 +72,7 @@ class Board(object):
         return self.m
 
     def find_adjacent_cards(self, card, x, y):
-        if x < 0 or y < 0 or x > 2*Pile.get_num_cards() or y > 2*Pile.get_num_cards():
+        if x < 0 or y < 0 or x > self.max_x or y > self.max_y:
             raise ValueError("location for card is outside the board")
         if self.empty:
             return [None, None]
@@ -79,12 +81,16 @@ class Board(object):
         horizontal_group = Sequence()
         horizontal_group.add(card)
         for yi in range(y+1, y+4, 1):
+            if yi > self.max_y - 1:
+                break
             if not self.m[x,yi].is_null():
                 horizontal_group.add(self.m[x,yi])
             else:
                 # there is a gap, so break
                 break
         for yi in range(y-1, y-4, -1):
+            if yi < 0:
+                break
             if not self.m[x,yi].is_null():
                 horizontal_group.add(self.m[x,yi])
             else:
@@ -94,11 +100,15 @@ class Board(object):
         vertical_group = Sequence()
         vertical_group.add(card)
         for xi in range(x+1, x+4, 1):
+            if xi > self.max_x - 1:
+                break
             if not self.m[xi, y].is_null():
                 vertical_group.add(self.m[xi, y])
             else:
                 break
         for xi in range(x-1, x-4, -1):
+            if xi < 0:
+                break
             if not self.m[xi, y].is_null():
                 vertical_group.add(self.m[xi, y])
             else:
@@ -128,6 +138,9 @@ class Board(object):
         vertical_groups = []
         for i in range(len(cards)):
             horizontal_group, vertical_group = self.find_adjacent_cards(cards[i], locations[i][0], locations[i][1])
+            # if the play was not valid, return None
+            if horizontal_group is None and vertical_group is None:
+                return None
             # if a card is next to nothing horizontally or vertically, then it must be the first play alone
             if len(cards) == 1 and horizontal_group.length() == 1 and vertical_group.length() == 1:
                 return cards[0].get_value()
