@@ -20,11 +20,11 @@ import copy
 
 class OneCardPlayer(Player):
     """ A player that only plays one card at a time """
-    def play_cards(self, board):
-        """
-
-        :param board:
-        :return: an Array of Cards, an Array of locations (each of x,y)
+    def play_cards(self, board, pile):
+        """ Play Cards
+        :param Board board: the game board
+        :param Pile pile:  the game pile
+        :return: an Array of Cards, an Array of locations (each of x,y) or None, None in the case of a discard
         """
         # if the board is empty, then play the first card in the middle
         if board.is_empty():
@@ -82,8 +82,6 @@ class OneCardPlayer(Player):
                         board_copy = copy.copy(board)
                         board_copy.place_card(self.hand.get_cards()[cd], [x,y])
                         current_score = board_copy.score_locations([self.hand.get_cards()[cd]], [[x,y]])
-                        # TODO: what if the play was invalid
-                        # TODO:  what if there are no valid plays and you have to discard
                         if current_score is None:
                             continue
                         if current_score > max_score:
@@ -93,6 +91,16 @@ class OneCardPlayer(Player):
                             max_card = cd
                     else:
                         continue
+        # if none of the cards can be played in a valid situation, then no score would have been produced
+        if max_score == 0:
+            to_discard = []
+            for i in range(4):
+                if self.hand.get_cards()[i].is_null():
+                    continue
+                else:
+                    to_discard.append(self.hand.get_cards()[i])
+            self.discard(pile, to_discard)
+            return None, None
 
         temp_card = self.hand.use_card(max_card)
         board.place_card(temp_card, [max_x, max_y])

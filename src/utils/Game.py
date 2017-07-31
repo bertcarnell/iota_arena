@@ -53,13 +53,14 @@ class Game(object):
             # rotate around the players
             player_index = cnt % self.num_players
             # let the player play the card on the board
-            played_cards, played_locations = self.players[player_index].play_cards(self.board)
-            # score the valid cards or identify an invalid move
-            score = self.board.score_locations(played_cards, played_locations)
-            if score is None:
-                print('Invalid move by player index %s' % str(player_index))
-                return None
-            self.scores[player_index] = score
+            played_cards, played_locations = self.players[player_index].play_cards(self.board, self.pile)
+            if played_cards is not None and played_locations is not None:
+                # score the valid cards or identify an invalid move
+                score = self.board.score_locations(played_cards, played_locations)
+                if score is None:
+                    print('Invalid move by player index %s' % str(player_index))
+                    return None
+                self.scores[player_index] = score
             self.players[player_index].draw(self.pile)
             cnt += 1
 

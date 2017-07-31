@@ -31,7 +31,6 @@ class Pile(object):
                 for k in range(Card.num_shapes):
                     self.pile.append(Card(i + 1, j + 1, k + 1, False))
         assert len(self.pile) == Pile.num_cards
-        self.pile_index = 0
         shuffle(self.pile)
 
     def get_next(self):
@@ -39,8 +38,7 @@ class Pile(object):
         :return Card: the next card on the pile
         """
         if self.has_next():
-            self.pile_index += 1
-            return self.pile[self.pile_index - 1]
+            return self.pile.pop(0)
         else:
             return Card.null_card()
 
@@ -48,8 +46,15 @@ class Pile(object):
         """ Does the pile have another card?
         :return bool: does the pile have another card?
         """
-        return self.pile_index < Pile.num_cards
+        return len(self.pile) > 0
 
     @classmethod
     def get_num_cards(cls):
         return cls.num_cards
+
+    def size(self):
+        return len(self.pile)
+
+    def return_cards(self, cards):
+        for cd in cards:
+            self.pile.append(cd)

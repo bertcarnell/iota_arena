@@ -23,13 +23,28 @@ class TestPlayer(TestCase):
     def test_player(self):
         p1 = Player()
         pile = Pile()
-        self.assertEqual(pile.pile_index, 0)
+        self.assertEqual(pile.size(), Pile.get_num_cards())
         p1.draw(pile)
-        self.assertEqual(pile.pile_index, 4)
+        self.assertEqual(pile.size(), Pile.get_num_cards() - 4)
         p1.hand.use_card(0)
         p1.draw(pile)
-        self.assertEqual(pile.pile_index, 5)
+        self.assertEqual(pile.size(), Pile.get_num_cards() - 5)
 
         p2 = Player()
         b = Board()
-        self.assertRaises(ValueError, p2.play_cards, b)
+        p = Pile()
+        self.assertRaises(ValueError, lambda: p2.play_cards(b, p))
+
+    def test_discard(self):
+        p1 = Player()
+        pile = Pile()
+        p1.draw(pile)
+        self.assertEqual(pile.size(), Pile.get_num_cards() - 4)
+        p1.hand.use_card(0)
+        p1.draw(pile)
+        self.assertEqual(pile.size(), Pile.get_num_cards() - 5)
+        p1.discard(pile, [0,1,2,3])
+        self.assertEqual(pile.size(), Pile.get_num_cards() - 1)
+
+        self.assertRaises(ValueError, lambda: p1.discard(pile, [2,5]))
+

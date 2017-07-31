@@ -14,6 +14,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from src.utils.Hand import Hand
+from src.utils.Card import Card
 import abc
 
 
@@ -25,9 +26,10 @@ class Player(object):
         self.hand = Hand()
 
     @abc.abstractmethod
-    def play_cards(self, board):
+    def play_cards(self, board, pile):
         """ Decide which cards to play, place the cards on the board, return the cards played with locations
         :param Board board: the board of play
+        :param Pile pile: the pile for discarding if necessary
         :return: an array of cards and an array of 2-length location arrays
         """
         raise ValueError("need to override this method")
@@ -37,3 +39,13 @@ class Player(object):
         :param Pile pile:  The common pile
         """
         self.hand.draw(pile)
+
+    def discard(self, pile, hand_indicies):
+        cards = []
+        for i in hand_indicies:
+            if 0 <= i < 4 and not self.hand.get_cards()[i].is_null():
+                cards.append(self.hand.use_card(i))
+                self.hand.get_cards()[i] = Card.null_card()
+            else:
+                raise ValueError("Cannot discard the cards selected from the hand")
+        pile.return_cards(cards)

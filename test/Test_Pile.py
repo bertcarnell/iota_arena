@@ -22,13 +22,13 @@ from src.utils.Card import Card
 class TestPile(TestCase):
     def test_pile(self):
         p = Pile()
-        self.assertEqual(p.pile_index, 0)
+        self.assertEqual(p.size(), Pile.get_num_cards())
         self.assertTrue(p.has_next())
         self.assertEqual(type(p.get_next()), type(Card.null_card()))
-        self.assertEqual(p.pile_index, 1)
+        self.assertEqual(p.size(), Pile.get_num_cards() - 1)
         self.assertTrue(p.has_next())
         self.assertTrue(p.get_next().get_value() < 5)
-        self.assertEqual(p.pile_index, 2)
+        self.assertEqual(p.size(), Pile.get_num_cards() - 2)
         # set the seed so that the shuffle is done the same way
         seed(1976)
         p1 = Pile()
@@ -37,8 +37,21 @@ class TestPile(TestCase):
         self.assertEqual(c1.get_color_str(), "blue")
         self.assertEqual(c1.get_shape_str(), "circle")
         p2 = Pile()
-        for i in range(Pile.num_cards):
+        for i in range(Pile.get_num_cards()):
             self.assertTrue(p2.has_next())
             c2 = p2.get_next()
         self.assertTrue(not p2.has_next())
         self.assertEqual(p2.get_next(), Card.null_card())
+
+    def test_return_cards(self):
+        p = Pile()
+        c1 = p.get_next()
+        c2 = p.get_next()
+        c3 = p.get_next()
+        c4 = p.get_next()
+        self.assertEqual(p.size(), Pile.get_num_cards() - 4)
+        p.return_cards([c1, c2])
+        self.assertEqual(p.size(), Pile.get_num_cards() - 2)
+        c5 = p.get_next()
+        self.assertFalse(c5 == c2)
+        self.assertFalse(c5 == c1)
