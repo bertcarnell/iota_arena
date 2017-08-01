@@ -15,17 +15,14 @@
 # SOFTWARE.
 from src.utils.Player import Player
 from src.utils.Pile import Pile
-import copy
+from copy import deepcopy
 
 
 class OneCardPlayer(Player):
     """ A player that only plays one card at a time """
     def play_cards(self, board, pile):
-        """ Play Cards
-        :param Board board: the game board
-        :param Pile pile:  the game pile
-        :return: an Array of Cards, an Array of locations (each of x,y) or None, None in the case of a discard
-        """
+        """ Overridden method, see parent class for details """
+        is_last_play = False
         # if the board is empty, then play the first card in the middle
         if board.is_empty():
             # find highest score card in hand
@@ -36,7 +33,7 @@ class OneCardPlayer(Player):
                     maxi = i
             temp_card = self.hand.use_card(maxi)
             board.place_card(temp_card, [Pile.get_num_cards(),Pile.get_num_cards()])
-            return [temp_card], [[Pile.get_num_cards(), Pile.get_num_cards()]]
+            return [temp_card], [[Pile.get_num_cards(), Pile.get_num_cards()]], is_last_play
 
         # for each card in the hand
         # for each location in the board
@@ -79,7 +76,7 @@ class OneCardPlayer(Player):
                         else:
                             if b[x-1,y].is_null() and b[x+1,y].is_null() and b[x,y+1].is_null() and b[x, y-1].is_null():
                                 continue
-                        board_copy = copy.copy(board)
+                        board_copy = deepcopy(board)
                         board_copy.place_card(self.hand.get_cards()[cd], [x,y])
                         current_score = board_copy.score_locations([self.hand.get_cards()[cd]], [[x,y]])
                         if current_score is None:
@@ -91,6 +88,7 @@ class OneCardPlayer(Player):
                             max_card = cd
                     else:
                         continue
+
         # if none of the cards can be played in a valid situation, then no score would have been produced
         if max_score == 0:
             to_discard = []
@@ -100,10 +98,14 @@ class OneCardPlayer(Player):
                 else:
                     to_discard.append(self.hand.get_cards()[i])
             self.discard(pile, to_discard)
-            return None, None
+            return None, None, False
 
         temp_card = self.hand.use_card(max_card)
         board.place_card(temp_card, [max_x, max_y])
 
-        return [temp_card], [[max_x, max_y]]
+        # if there are no cards left in the hand and none left in the pile, then this is the last turn
+        if self.hand.get_num_open() == 4 and not pile.has_next():
+            is_last_play = True
+
+        return [temp_card], [[max_x, max_y]], is_last_play
 

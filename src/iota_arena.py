@@ -16,13 +16,14 @@
 
 from src.config import players
 from src.utils.Game import Game
+import logging
 
 
 def main():
     print("iota_area main method")
     g = Game(players)
-    g.play()
+    scores = g.play()
 
 if __name__ == "__main__":
+    logging.basicConfig(filename="iota_arena.log", level=logging.DEBUG, filemode='w')
     main()
-

@@ -23,12 +23,12 @@ from src.utils.Game import Game
 class Player1(Player):
     """ a player with a user defined play_cards method"""
 
-    def play_cards(self, board):
+    def play_cards(self, board, pile):
         print("Player 1 playing")
 
 
 class Player2(Player):
-    def play_cards(self, board):
+    def play_cards(self, board, pile):
         print("Player 2 playing")
 
 
@@ -36,4 +36,4 @@ player1 = Player1()
 player2 = Player2()
 players = [player1, player2]
 g = Game(players)
-g.play()
+scores = g.play()

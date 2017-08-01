@@ -30,7 +30,7 @@ class Player(object):
         """ Decide which cards to play, place the cards on the board, return the cards played with locations
         :param Board board: the board of play
         :param Pile pile: the pile for discarding if necessary
-        :return: an array of cards and an array of 2-length location arrays
+        :return: an Array of Cards, an Array of locations (each of x,y) or None, None in the case of a discard and an indicator if this is the last play
         """
         raise ValueError("need to override this method")
 

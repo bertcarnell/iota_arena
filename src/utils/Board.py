@@ -17,6 +17,7 @@ import numpy as npy
 from src.utils.Pile import Pile
 from src.utils.Card import Card
 from src.utils.Sequence import Sequence
+import logging
 
 
 class Board(object):
@@ -61,12 +62,6 @@ class Board(object):
             raise ValueError("each location must have an x and y value")
         for i in range(len(cards)):
             self.place_card(cards[i], locations[i])
-        # after cards are placed, return score
-        base_score = 0
-        for i in range(len(cards)):
-            base_score += cards[i].get_value()
-        # TODO:  Complete scoring algorithm
-        return base_score
 
     def get_board(self):
         return self.m
@@ -133,6 +128,7 @@ class Board(object):
             raise ValueError("the length of cards and locations should be the same")
         if len(locations) != 0 and len(locations[0]) != 2:
             raise ValueError("the length of the first locations should be two")
+        logging.debug('Board: Scoring move')
         # find the groups for all the cards that are played
         horizontal_groups = []
         vertical_groups = []
@@ -153,6 +149,12 @@ class Board(object):
         # find the unique sequences that are created
         horizontal_groups = set(horizontal_groups)
         vertical_groups = set(vertical_groups)
+
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+            for seq in horizontal_groups:
+                logging.debug('Board: Horizontal sequences: {0}'.format(','.join(str(cd) for cd in seq.get_cards())))
+            for seq in vertical_groups:
+                logging.debug('Board: Vertical sequences: {0}'.format(','.join(str(cd) for cd in seq.get_cards())))
 
         score = 0
         for seq in horizontal_groups:
