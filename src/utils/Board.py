@@ -27,14 +27,19 @@ class Board(object):
         """ Initialize the Board """
         self.max_x = 2 * Pile.get_num_cards()
         self.max_y = 2 * Pile.get_num_cards()
+        # the board is represented by a sparse matrix of locations and a dense matrix
         self.m = npy.ndarray(shape=(self.max_x, self.max_y), dtype=object, order='C')
+        self.x = []
+        self.y  []
         for i in range(self.max_x):
             for j in range(self.max_y):
-                self.m[i, j] = Card.null_card()
-        self.empty = True
+                self.m[i, j] = None
 
     def is_empty(self):
-        return self.empty
+        if len(self.x) == 0:
+            return True
+        else:
+            return False
 
     def place_card(self, card, location):
         """ Place a card on the board
@@ -43,7 +48,8 @@ class Board(object):
         :return:
         """
         self.m[location[0], location[1]] = card
-        self.empty = False
+        self.x.add(location[0])
+        self.y.add(location[1])
 
     def place_cards(self, cards, locations):
         """ Place cards on the board
@@ -63,8 +69,11 @@ class Board(object):
         for i in range(len(cards)):
             self.place_card(cards[i], locations[i])
 
-    def get_board(self):
-        return self.m
+    #def get_board(self):
+    #    return self.m
+
+    def get(self, x, y):
+        return self.m[x, y]
 
     def find_adjacent_cards(self, card, x, y):
         if x < 0 or y < 0 or x > self.max_x or y > self.max_y:
